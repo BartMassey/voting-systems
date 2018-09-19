@@ -63,7 +63,13 @@ impl VotingSystem for PluralityVoting {
 mod test {
     use super::*;
 
-    const TEST_POLL: &[&[usize]] = &[&[2, 1, 0], &[0, 1, 2], &[0, 2, 1], &[1, 2], &[]];
+    const TEST_POLL: &[&[usize]] = &[
+        &[2, 1, 0],
+        &[0, 1, 2],
+        &[0, 2, 1],
+        &[1, 2],
+        &[],
+    ];
 
     fn make_poll() -> Poll {
         Poll(
