@@ -30,8 +30,9 @@ impl Poll {
 
 /// A voting system is defined by its election function.
 pub trait VotingSystem {
-    /// Run an election.
-    fn election(Poll) -> Ranking;
+    /// Run an election. Returns `Some` ranking or `None`
+    /// in case of an irresolvable tie.
+    fn election(Poll) -> Option<Ranking>;
 }
 
 /// Plurality voting ranks candidates by
@@ -39,7 +40,7 @@ pub trait VotingSystem {
 pub struct PluralityVoting;
 
 impl VotingSystem for PluralityVoting {
-    fn election(poll: Poll) -> Ranking {
+    fn election(poll: Poll) -> Option<Ranking> {
         let ncandidates = poll.ncandidates();
         let mut votes = vec![0; ncandidates];
         for r in poll.0 {
@@ -50,7 +51,11 @@ impl VotingSystem for PluralityVoting {
         }
         let mut ranking: Vec<usize> = (0..ncandidates).collect();
         ranking.sort_by_key(|c| -votes[*c]);
-        ranking.into_iter().map(Candidate).collect()
+        if ranking.len() >= 2 && votes[ranking[1]] == votes[ranking[0]] {
+            // It's a tie.
+            return None;
+        }
+        Some(ranking.into_iter().map(Candidate).collect())
     }
 }
 
@@ -71,7 +76,9 @@ mod test {
 
     #[test]
     fn try_plurality() {
-        let result = PluralityVoting::election(make_poll());
-        assert_eq!(result[0], Candidate(0));
+        match PluralityVoting::election(make_poll()) {
+            Some(result) => assert_eq!(result[0], Candidate(0)),
+            None => panic!("election rejected all candidates"),
+        }
     }
 }
