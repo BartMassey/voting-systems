@@ -15,7 +15,6 @@ pub type Ranking = Vec<Candidate>;
 pub struct Poll(Vec<Ranking>);
 
 impl Poll {
-
     /// Find the number of candidates implicitly in the
     /// poll.  Specifically, return one more than the
     /// highest candidate number found.
@@ -31,7 +30,6 @@ impl Poll {
 
 /// A voting system is defined by its election function.
 pub trait VotingSystem {
-
     /// Run an election.
     fn election(Poll) -> Ranking;
 }
@@ -41,7 +39,6 @@ pub trait VotingSystem {
 pub struct PluralityVoting;
 
 impl VotingSystem for PluralityVoting {
-
     fn election(poll: Poll) -> Ranking {
         let ncandidates = poll.ncandidates();
         let mut votes = vec![0; ncandidates];
@@ -61,16 +58,15 @@ impl VotingSystem for PluralityVoting {
 mod test {
     use super::*;
 
-    const TEST_POLL: &[&[usize]] = &[
-        &[2,1,0],
-        &[0,1,2],
-        &[0,2,1],
-        &[1,2],
-        &[],
-    ];
+    const TEST_POLL: &[&[usize]] = &[&[2, 1, 0], &[0, 1, 2], &[0, 2, 1], &[1, 2], &[]];
 
     fn make_poll() -> Poll {
-        Poll(TEST_POLL.iter().map(|r| r.iter().map(|c| Candidate(*c)).collect()).collect())
+        Poll(
+            TEST_POLL
+                .iter()
+                .map(|r| r.iter().map(|c| Candidate(*c)).collect())
+                .collect(),
+        )
     }
 
     #[test]
