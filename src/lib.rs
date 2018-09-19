@@ -1,7 +1,9 @@
-// Copyright © 2018 Bart Massey
-
 //! Rust implementations of various voting systems, with a
 //! common interface.
+
+mod plurality;
+
+pub use plurality::*;
 
 /// Newtype for candidates. For convenience, the candidates
 /// are assumed to be numbered contiguously starting at 0.
@@ -33,30 +35,6 @@ pub trait VotingSystem {
     /// Run an election. Returns `Some` ranking or `None`
     /// in case of an irresolvable tie.
     fn election(Poll) -> Option<Ranking>;
-}
-
-/// Plurality voting ranks candidates by
-/// number of top ballot rankings.
-pub struct PluralityVoting;
-
-impl VotingSystem for PluralityVoting {
-    fn election(poll: Poll) -> Option<Ranking> {
-        let ncandidates = poll.ncandidates();
-        let mut votes = vec![0; ncandidates];
-        for r in poll.0 {
-            if r.is_empty() {
-                continue;
-            }
-            votes[r[0].0] += 1;
-        }
-        let mut ranking: Vec<usize> = (0..ncandidates).collect();
-        ranking.sort_by_key(|c| -votes[*c]);
-        if ranking.len() >= 2 && votes[ranking[1]] == votes[ranking[0]] {
-            // It's a tie.
-            return None;
-        }
-        Some(ranking.into_iter().map(Candidate).collect())
-    }
 }
 
 #[cfg(test)]
