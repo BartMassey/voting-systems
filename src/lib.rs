@@ -51,10 +51,9 @@ impl VotingSystem for PluralityVoting {
             }
             votes[r[0].0] += 1;
         }
-        let mut ranking: Vec<Candidate> =
-            (0..ncandidates).map(|c| Candidate(c)).collect();
-        ranking.sort_by_key(|c| -votes[c.0]);
-        ranking
+        let mut ranking: Vec<usize> = (0..ncandidates).collect();
+        ranking.sort_by_key(|c| -votes[*c]);
+        ranking.into_iter().map(Candidate).collect()
     }
 }
 
